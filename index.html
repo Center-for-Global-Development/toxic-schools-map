@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Toxic Schools: School Proximity to Polluted Sites</title>
+<link rel="icon" href="data:,">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H"
       crossorigin="anonymous"/>
@@ -86,6 +87,34 @@
   .school-item:last-child { border-bottom: none; }
 
   #count-label { font-size: 11px; color: #777; margin-top: 8px; }
+
+  /* Toasts (used for transient and persistent error messages) */
+  #toast-container {
+    position: absolute; top: 12px; right: 12px; z-index: 3000;
+    display: flex; flex-direction: column; gap: 8px; max-width: 320px;
+    pointer-events: none;
+  }
+  .toast {
+    background: rgba(40,15,15,0.95); color: #ffdada;
+    border: 1px solid rgba(255,100,100,0.4);
+    border-radius: 8px; padding: 10px 30px 10px 14px;
+    font-size: 12px; line-height: 1.45;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    position: relative; pointer-events: auto;
+    animation: toast-in 180ms ease-out;
+  }
+  .toast .close {
+    position: absolute; top: 4px; right: 6px;
+    background: none; border: 0; color: inherit;
+    opacity: 0.55; cursor: pointer; font-size: 16px;
+    padding: 2px 6px; line-height: 1;
+  }
+  .toast .close:hover, .toast .close:focus-visible { opacity: 1; }
+  .toast .close:focus-visible { outline: 2px solid #ffb52c; outline-offset: 1px; }
+  @keyframes toast-in {
+    from { transform: translateX(16px); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+  }
 </style>
 </head>
 <body>
@@ -96,6 +125,8 @@
   <span class="spinner" aria-hidden="true">⟳</span>
   Loading 5km school data…
 </div>
+
+<div id="toast-container" aria-live="polite"></div>
 
 <!-- ── Side panel ── -->
 <div id="panel">
@@ -171,6 +202,27 @@
 <script>
 // Fire view event as early as possible; trackView is idempotent.
 CGDTracking.trackView();
+
+// ── Toast helper ─────────────────────────────────────────────────────────────
+// Persistent toasts stay until dismissed; transient ones auto-remove after 6s.
+function showToast(message, opts) {
+  opts = opts || {};
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.setAttribute('role', 'alert');
+  toast.textContent = message;
+  const close = document.createElement('button');
+  close.className = 'close';
+  close.setAttribute('aria-label', 'Dismiss');
+  close.textContent = '×';
+  close.onclick = () => toast.remove();
+  toast.appendChild(close);
+  container.appendChild(toast);
+  if (!opts.persistent) {
+    setTimeout(() => toast.remove(), opts.duration || 6000);
+  }
+}
 // ── Data (loaded from JSON) ─────────────────────────────────────────────
 // SITES format:   [lat, lon, name, industry, country, site_id, n1km, n5km]
 // SCHOOL1 format: [lat, lon, name, country, dist_km, site_id]
@@ -345,7 +397,7 @@ function load5kmSchools(filterCountry='') {
     })
     .catch(() => {
       loading.style.display = 'none';
-      alert('Could not load schools_5km_data.json — make sure it is in the same folder as this HTML file.');
+      showToast('Could not load 1–5 km school data. Try toggling the layer again.');
       document.getElementById('chk-s5km').checked = false;
       state.s5km = false;
     });
@@ -411,7 +463,8 @@ map.on('popupopen', (e) => {
     renderBuffers();
     loading.style.display = 'none';
   }).catch(err => {
-    loading.innerHTML = '<div style="color:#ff8888">Failed to load map data.<br><small>' + err.message + '</small></div>';
+    loading.style.display = 'none';
+    showToast('Failed to load map data (' + err.message + '). Please reload the page.', { persistent: true });
   });
 })();
 

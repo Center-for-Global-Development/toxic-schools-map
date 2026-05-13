@@ -100,7 +100,7 @@
 <!-- ── Side panel ── -->
 <div id="panel">
   <h2>☠️ TOXIC SCHOOLS</h2>
-  <p class="sub">School proximity to polluted sites in LMICs &mdash; <a href="about.html" style="color:#e87040;text-decoration:none;" target="_blank">About &amp; paper ↗</a></p>
+  <p class="sub">School proximity to polluted sites in LMICs &mdash; <a href="about.html" style="color:#e87040;text-decoration:none;" target="_blank" onclick="CGDTracking.trackEngagement('external_link','about_page')">About &amp; paper ↗</a></p>
 
   <div class="stat-row">
     <div class="stat"><div class="n" id="s-sites">2,971</div><div class="l">Polluted sites</div></div>
@@ -133,10 +133,10 @@
 
   <div class="section-label" id="filter-heading">Filter</div>
 
-  <select id="country-filter" onchange="applyFilters()" aria-label="Filter by country">
+  <select id="country-filter" onchange="onFilterChange('country', this)" aria-label="Filter by country">
     <option value="">All countries</option>
   </select>
-  <select id="industry-filter" onchange="applyFilters()" aria-label="Filter by industry">
+  <select id="industry-filter" onchange="onFilterChange('industry', this)" aria-label="Filter by industry">
     <option value="">All industries</option>
     <option>Battery (ULAB)</option>
     <option>Manufacturing</option>
@@ -167,7 +167,10 @@
 <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"
         integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr"
         crossorigin="anonymous"></script>
+<script src="tracking.js"></script>
 <script>
+// Fire view event as early as possible; trackView is idempotent.
+CGDTracking.trackView();
 // ── Data (loaded from JSON) ─────────────────────────────────────────────
 // SITES format:   [lat, lon, name, industry, country, site_id, n1km, n5km]
 // SCHOOL1 format: [lat, lon, name, country, dist_km, site_id]
@@ -260,6 +263,7 @@ function renderSites(filterCountry='', filterIndustry='') {
       <div class="popup-stat">Schools within <strong>5 km</strong>: <strong>${n5}</strong></div>
       ${schools1.length ? `<div class="school-list">${schoolList}${moreNote}</div>` : ''}
     `, {maxWidth: 280});
+    m._cgdAction = ['detail_open', 'site_popup', industry];
     siteLayer.addLayer(m);
     siteMarkers.push({m, country, industry});
   });
@@ -283,6 +287,7 @@ function renderSchools1(filterCountry='', filterIndustry='') {
       <div class="popup-stat">Distance to nearest site: <strong>${dist} km</strong></div>
       <div class="popup-stat" style="color:#ff6666;font-weight:600">⚠️ Within 1 km of polluted site</div>
     `);
+    m._cgdAction = ['detail_open', 'school_1km_popup', country];
     markers.push(m);
   });
   cluster1km.addLayers(markers);
@@ -332,6 +337,7 @@ function load5kmSchools(filterCountry='') {
           <div class="popup-stat">Distance to nearest site: <strong>${dist} km</strong></div>
           <div class="popup-stat" style="color:#ffb52c;font-weight:600">⚠️ Within 1–5 km of polluted site</div>
         `);
+        m._cgdAction = ['detail_open', 'school_5km_popup', country];
         markers.push(m);
       });
       cluster5km.addLayers(markers);
@@ -346,8 +352,15 @@ function load5kmSchools(filterCountry='') {
 }
 
 // ── Layer toggle ─────────────────────────────────────────────────────────────
+const LAYER_TRACK_LABEL = {
+  sites: 'layer_sites',
+  s1km:  'layer_schools_1km',
+  s5km:  'layer_schools_5km',
+  buffers: 'layer_buffers'
+};
 function toggleLayer(key) {
   state[key] = document.getElementById(`chk-${key}`).checked;
+  CGDTracking.trackEngagement('filter', LAYER_TRACK_LABEL[key], state[key] ? 'on' : 'off');
   if (state[key]) {
     if (key === 's5km' && !state.s5kmLoaded) {
       load5kmSchools(document.getElementById('country-filter').value);
@@ -361,12 +374,24 @@ function toggleLayer(key) {
 }
 
 // ── Filter apply ─────────────────────────────────────────────────────────────
+function onFilterChange(which, el) {
+  const label = which === 'country' ? 'country_filter' : 'industry_filter';
+  CGDTracking.trackEngagement('filter', label, el.value);
+  applyFilters();
+}
 function applyFilters() {
   const fc = document.getElementById('country-filter').value;
   const fi = document.getElementById('industry-filter').value;
   renderSites(fc, fi);
   renderSchools1(fc, fi);
 }
+
+// ── Popup-open tracking ──────────────────────────────────────────────────────
+// Single map-level listener; each marker carries its own _cgdAction tuple.
+map.on('popupopen', (e) => {
+  const a = e.layer && e.layer._cgdAction;
+  if (a) CGDTracking.trackEngagement(a[0], a[1], a[2]);
+});
 
 // ── Bootstrap: load core data, then render ──────────────────────────────────
 (function init() {
@@ -395,6 +420,21 @@ map.attributionControl.setPrefix(
   'Data: <a href="https://www.contaminatedsites.org">Pure Earth TSIP</a> · ' +
   '<a href="https://overturemaps.org">Overture Maps</a> · Crawfurd (2026)'
 );
+
+// Track outbound clicks on data-source attribution links.
+const attrEl = map.attributionControl.getContainer();
+if (attrEl) {
+  attrEl.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (href.includes('contaminatedsites.org') || href.includes('pureearth.org')) {
+      CGDTracking.trackEngagement('external_link', 'source_pure_earth');
+    } else if (href.includes('overturemaps.org')) {
+      CGDTracking.trackEngagement('external_link', 'source_overture');
+    }
+  });
+}
 </script>
 </body>
 </html>

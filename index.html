@@ -176,10 +176,10 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 
 // ── Layer groups ─────────────────────────────────────────────────────────────
 const siteLayer    = L.layerGroup().addTo(map);
-const cluster1km   = L.markerClusterGroup({ maxClusterRadius: 40, disableClusteringAtZoom: 13,
+const cluster1km   = L.markerClusterGroup({ maxClusterRadius: 40, disableClusteringAtZoom: 13, chunkedLoading: true,
   iconCreateFunction: c => L.divIcon({html:`<div style="background:#a03030;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #d15553">${c.getChildCount()}</div>`,className:'',iconSize:[28,28]})
 }).addTo(map);
-const cluster5km   = L.markerClusterGroup({ maxClusterRadius: 40, disableClusteringAtZoom: 13,
+const cluster5km   = L.markerClusterGroup({ maxClusterRadius: 40, disableClusteringAtZoom: 13, chunkedLoading: true,
   iconCreateFunction: c => L.divIcon({html:`<div style="background:#b07800;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #ffb52c">${c.getChildCount()}</div>`,className:'',iconSize:[28,28]})
 });
 const bufferLayer  = L.layerGroup();
@@ -252,6 +252,7 @@ function renderSites(filterCountry='', filterIndustry='') {
 // ── Render 1km schools ───────────────────────────────────────────────────────
 function renderSchools1(filterCountry='', filterIndustry='') {
   cluster1km.clearLayers();
+  const markers = [];
   SCHOOL1.forEach(s => {
     const [lat, lon, name, country, dist, sid] = s;
     if (filterCountry && country !== filterCountry) return;
@@ -264,8 +265,9 @@ function renderSchools1(filterCountry='', filterIndustry='') {
       <div class="popup-stat">Distance to nearest site: <strong>${dist} km</strong></div>
       <div class="popup-stat" style="color:#ff6666;font-weight:600">⚠️ Within 1 km of polluted site</div>
     `);
-    cluster1km.addLayer(m);
+    markers.push(m);
   });
+  cluster1km.addLayers(markers);
 }
 
 // ── Render 5km buffer circles ────────────────────────────────────────────────
@@ -299,6 +301,7 @@ function load5kmSchools(filterCountry='') {
     })
     .then(data => {
       loading.style.display = 'none';
+      const markers = [];
       data.forEach(s => {
         const [lat, lon, name, country, dist] = s;
         if (filterCountry && country !== filterCountry) return;
@@ -311,8 +314,9 @@ function load5kmSchools(filterCountry='') {
           <div class="popup-stat">Distance to nearest site: <strong>${dist} km</strong></div>
           <div class="popup-stat" style="color:#ffb52c;font-weight:600">⚠️ Within 1–5 km of polluted site</div>
         `);
-        cluster5km.addLayer(m);
+        markers.push(m);
       });
+      cluster5km.addLayers(markers);
       state.s5kmLoaded = true;
     })
     .catch(() => {
@@ -334,7 +338,6 @@ function toggleLayer(key) {
     } else {
       map.addLayer(layers[key]);
     }
-    if (key === 'buffers') renderBuffers();
   } else {
     map.removeLayer(layers[key]);
   }
@@ -363,6 +366,7 @@ function applyFilters() {
     populateCountryFilter();
     renderSites();
     renderSchools1();
+    renderBuffers();
     loading.style.display = 'none';
   }).catch(err => {
     loading.innerHTML = '<div style="color:#ff8888">Failed to load map data.<br><small>' + err.message + '</small></div>';

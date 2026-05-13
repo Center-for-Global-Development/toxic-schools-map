@@ -36,6 +36,14 @@
   .toggle-row span { font-size: 12px; }
   .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
 
+  /* Visible focus ring for keyboard users (dark panel makes browser default invisible) */
+  #panel input[type=checkbox]:focus-visible,
+  #panel select:focus-visible,
+  #panel a:focus-visible {
+    outline: 2px solid #ffb52c;
+    outline-offset: 2px;
+  }
+
   /* Filters */
   select { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
     color: #ddd; border-radius: 5px; padding: 5px 7px; font-size: 11.5px; margin-bottom: 6px; }
@@ -78,8 +86,8 @@
 
 <div id="map"></div>
 
-<div id="loading">
-  <span class="spinner">⟳</span>
+<div id="loading" role="status" aria-live="polite">
+  <span class="spinner" aria-hidden="true">⟳</span>
   Loading 5km school data…
 </div>
 
@@ -96,33 +104,33 @@
 
   <div class="section-label">Layers</div>
 
-  <div class="toggle-row" onclick="toggleLayer('sites')">
-    <input type="checkbox" id="chk-sites" checked>
-    <span class="dot" style="background:#e87040"></span>
+  <label class="toggle-row">
+    <input type="checkbox" id="chk-sites" checked onchange="toggleLayer('sites')">
+    <span class="dot" style="background:#e87040" aria-hidden="true"></span>
     <span>Polluted sites (TSIP)</span>
-  </div>
-  <div class="toggle-row" onclick="toggleLayer('s1km')">
-    <input type="checkbox" id="chk-s1km" checked>
-    <span class="dot" style="background:#d15553"></span>
+  </label>
+  <label class="toggle-row">
+    <input type="checkbox" id="chk-s1km" checked onchange="toggleLayer('s1km')">
+    <span class="dot" style="background:#d15553" aria-hidden="true"></span>
     <span>Schools within 1 km</span>
-  </div>
-  <div class="toggle-row" onclick="toggleLayer('s5km')">
-    <input type="checkbox" id="chk-s5km">
-    <span class="dot" style="background:#ffb52c"></span>
+  </label>
+  <label class="toggle-row">
+    <input type="checkbox" id="chk-s5km" onchange="toggleLayer('s5km')">
+    <span class="dot" style="background:#ffb52c" aria-hidden="true"></span>
     <span>Schools 1–5 km <small style="color:#666">(loads ~8MB)</small></span>
-  </div>
-  <div class="toggle-row" onclick="toggleLayer('buffers')">
-    <input type="checkbox" id="chk-buffers">
-    <span class="dot" style="background:rgba(232,112,64,0.35); border:1px solid #e87040"></span>
+  </label>
+  <label class="toggle-row">
+    <input type="checkbox" id="chk-buffers" onchange="toggleLayer('buffers')">
+    <span class="dot" style="background:rgba(232,112,64,0.35); border:1px solid #e87040" aria-hidden="true"></span>
     <span>5km buffer circles</span>
-  </div>
+  </label>
 
-  <div class="section-label">Filter</div>
+  <div class="section-label" id="filter-heading">Filter</div>
 
-  <select id="country-filter" onchange="applyFilters()">
+  <select id="country-filter" onchange="applyFilters()" aria-label="Filter by country">
     <option value="">All countries</option>
   </select>
-  <select id="industry-filter" onchange="applyFilters()">
+  <select id="industry-filter" onchange="applyFilters()" aria-label="Filter by industry">
     <option value="">All industries</option>
     <option>Battery (ULAB)</option>
     <option>Manufacturing</option>
@@ -329,8 +337,7 @@ function load5kmSchools(filterCountry='') {
 
 // ── Layer toggle ─────────────────────────────────────────────────────────────
 function toggleLayer(key) {
-  state[key] = !state[key];
-  document.getElementById(`chk-${key}`).checked = state[key];
+  state[key] = document.getElementById(`chk-${key}`).checked;
   if (state[key]) {
     if (key === 's5km' && !state.s5kmLoaded) {
       load5kmSchools(document.getElementById('country-filter').value);

@@ -75,6 +75,30 @@
     letter-spacing: 0.7px; margin-bottom: 7px; }
   .legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 11px; }
 
+  /* Zoom controls */
+  .leaflet-control-zoom {
+    border: 1px solid rgba(255,255,255,0.14) !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.45);
+  }
+  .leaflet-control-zoom a {
+    width: 32px !important; height: 32px !important; line-height: 31px !important;
+    background: rgba(15,15,30,0.94) !important;
+    color: #ffb52c !important;
+    border-color: rgba(255,255,255,0.12) !important;
+    font-size: 20px !important;
+  }
+  .leaflet-control-zoom a:hover,
+  .leaflet-control-zoom a:focus-visible {
+    background: rgba(255,181,44,0.18) !important;
+    color: #ffd27a !important;
+  }
+  .leaflet-control-zoom a:focus-visible {
+    outline: 2px solid #ffb52c;
+    outline-offset: -2px;
+  }
+
   /* Popup */
   .leaflet-popup-content-wrapper { background: #1e1e35; border: 1px solid rgba(255,255,255,0.12);
     color: #ddd; border-radius: 8px; }
@@ -253,7 +277,8 @@ const IND_COLOR = {
 const indColor = g => IND_COLOR[g] || '#888';
 
 // ── Map init ─────────────────────────────────────────────────────────────────
-const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([10, 20], 3);
+const map = L.map('map', { zoomControl: false, preferCanvas: true }).setView([10, 20], 3);
+L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '©<a href="https://www.openstreetmap.org/copyright">OSM</a> ©<a href="https://carto.com">CARTO</a>',

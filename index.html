@@ -217,14 +217,14 @@
 <!-- ── Legend ── -->
 <div id="legend">
   <h4>Site industry</h4>
-  <div class="legend-row"><span class="dot" style="background:#e8a020"></span> Battery (ULAB)</div>
-  <div class="legend-row"><span class="dot" style="background:#4a90d9"></span> Manufacturing</div>
-  <div class="legend-row"><span class="dot" style="background:#7b4f9e"></span> Mining & smelting</div>
-  <div class="legend-row"><span class="dot" style="background:#888"></span> Other</div>
-  <div class="legend-row"><span class="dot" style="background:#2ecc71"></span> Recycling & waste</div>
+  <div class="legend-row"><span class="dot" style="background:#fee8bf"></span> Battery (ULAB)</div>
+  <div class="legend-row"><span class="dot" style="background:#2d99b5"></span> Manufacturing</div>
+  <div class="legend-row"><span class="dot" style="background:#0b4c5b"></span> Mining & smelting</div>
+  <div class="legend-row"><span class="dot" style="background:#bfdee0"></span> Other</div>
+  <div class="legend-row"><span class="dot" style="background:#00896c"></span> Recycling & waste</div>
   <hr style="border-color:rgba(255,255,255,0.1);margin:7px 0">
-  <div class="legend-row"><span class="dot" style="background:#ff4444"></span> School &lt;1km</div>
-  <div class="legend-row"><span class="dot" style="background:#ffaa22"></span> School 1–5km</div>
+  <div class="legend-row"><span class="dot" style="background:#d15553"></span> School &lt;1km</div>
+  <div class="legend-row"><span class="dot" style="background:#ffb52c"></span> School 1–5km</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"
@@ -268,11 +268,11 @@ let SCHOOL1 = [];
 
 // ── Industry colours ─────────────────────────────────────────────────────────
 const IND_COLOR = {
-  'Battery (ULAB)':  '#e8a020',
-  'Manufacturing':   '#4a90d9',
-  'Mining & smelting': '#9b6dbf',
-  'Other':           '#888888',
-  'Recycling & waste': '#2ecc71'
+  'Battery (ULAB)':  '#fee8bf',
+  'Manufacturing':   '#2d99b5',
+  'Mining & smelting': '#0b4c5b',
+  'Other':           '#bfdee0',
+  'Recycling & waste': '#00896c'
 };
 const indColor = g => IND_COLOR[g] || '#888';
 
@@ -325,10 +325,10 @@ fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
 // ── Layer groups ─────────────────────────────────────────────────────────────
 const siteLayer    = L.layerGroup().addTo(map);
 const cluster1km   = L.markerClusterGroup({ maxClusterRadius: 40, disableClusteringAtZoom: 13, chunkedLoading: true,
-  iconCreateFunction: c => L.divIcon({html:`<div style="background:#a03030;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #d15553">${c.getChildCount()}</div>`,className:'',iconSize:[28,28]})
+  iconCreateFunction: c => L.divIcon({html:`<div style="background:#d15553;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #d15553">${c.getChildCount()}</div>`,className:'',iconSize:[28,28]})
 }).addTo(map);
 const cluster5km   = L.markerClusterGroup({ maxClusterRadius: 40, disableClusteringAtZoom: 13, chunkedLoading: true,
-  iconCreateFunction: c => L.divIcon({html:`<div style="background:#b07800;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #ffb52c">${c.getChildCount()}</div>`,className:'',iconSize:[28,28]})
+  iconCreateFunction: c => L.divIcon({html:`<div style="background:#ffb52c;color:#1a1a2e;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #ffb52c">${c.getChildCount()}</div>`,className:'',iconSize:[28,28]})
 });
 const bufferLayer  = L.layerGroup();
 
@@ -416,13 +416,13 @@ function renderSchools1(filterCountry='', filterIndustry='') {
     const [lat, lon, name, country, dist, sid] = s;
     if (filterCountry && country !== filterCountry) return;
     const m = L.circleMarker([lat, lon], {
-      radius: 6, color: '#fff', weight: 0.8, fillColor: '#ff4444', fillOpacity: 0.9
+      radius: 6, color: '#fff', weight: 0.8, fillColor: '#d15553', fillOpacity: 0.9
     });
     m.bindPopup(`
       <div class="popup-title">🏫 ${escapeHtml(name)}</div>
       <div class="popup-sub">${escapeHtml(country)}</div>
       <div class="popup-stat">Distance to nearest site: <strong>${escapeHtml(dist)} km</strong></div>
-      <div class="popup-stat" style="color:#ff6666;font-weight:600">⚠️ Within 1 km of polluted site</div>
+      <div class="popup-stat" style="color:#d15553;font-weight:600">⚠️ Within 1 km of polluted site</div>
     `);
     m._cgdAction = ['detail_open', 'school_1km_popup', country];
     markers.push(m);
@@ -440,8 +440,8 @@ function renderBuffers() {
       fillColor: '#e87040', fillOpacity: 0.05, interactive: false
     }).addTo(bufferLayer);
     if (n1 > 0) {
-      L.circle([lat, lon], { radius: 1000, color: '#ff4444', weight: 1,
-        fillColor: '#ff4444', fillOpacity: 0.08, interactive: false
+      L.circle([lat, lon], { radius: 1000, color: '#d15553', weight: 1,
+        fillColor: '#d15553', fillOpacity: 0.08, interactive: false
       }).addTo(bufferLayer);
     }
   });
@@ -466,13 +466,13 @@ function load5kmSchools(filterCountry='') {
         const [lat, lon, name, country, dist] = s;
         if (filterCountry && country !== filterCountry) return;
         const m = L.circleMarker([lat, lon], {
-          radius: 5, color: '#fff', weight: 0.5, fillColor: '#ffaa22', fillOpacity: 0.75
+          radius: 5, color: '#fff', weight: 0.5, fillColor: '#ffb52c', fillOpacity: 0.75
         });
         m.bindPopup(`
           <div class="popup-title">🏫 ${escapeHtml(name)}</div>
           <div class="popup-sub">${escapeHtml(country)}</div>
           <div class="popup-stat">Distance to nearest site: <strong>${escapeHtml(dist)} km</strong></div>
-          <div class="popup-stat" style="color:#ffaa22;font-weight:600">⚠️ Within 1–5 km of polluted site</div>
+          <div class="popup-stat" style="color:#ffb52c;font-weight:600">⚠️ Within 1–5 km of polluted site</div>
         `);
         m._cgdAction = ['detail_open', 'school_5km_popup', country];
         markers.push(m);

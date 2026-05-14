@@ -325,6 +325,16 @@ function buildSiteTo1km() {
   });
 }
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[ch]);
+}
+
 // ── Populate country filter (built after data loads) ────────────────────────
 function populateCountryFilter() {
   const countries = [...new Set(SITES.filter(s => s[7] > 0).map(s => s[4]).filter(Boolean))].sort();
@@ -354,15 +364,15 @@ function renderSites(filterCountry='', filterIndustry='') {
     });
     const schools1 = siteTo1km[sid] || [];
     const schoolList = schools1.slice(0, 10).map(sc =>
-      `<div class="school-item">🏫 ${sc[2]} <span style="color:#888">(${sc[4]} km)</span></div>`
+      `<div class="school-item">🏫 ${escapeHtml(sc[2])} <span style="color:#888">(${escapeHtml(sc[4])} km)</span></div>`
     ).join('');
     const moreNote = schools1.length > 10 ? `<div style="font-size:10px;color:#666;margin-top:3px">…and ${schools1.length-10} more</div>` : '';
 
     m.bindPopup(`
-      <div class="popup-title">${name}</div>
-      <div class="popup-sub">${industry} · ${country}</div>
-      <div class="popup-stat">Schools within <strong>1 km</strong>: <strong>${n1}</strong></div>
-      <div class="popup-stat">Schools within <strong>5 km</strong>: <strong>${n5}</strong></div>
+      <div class="popup-title">${escapeHtml(name)}</div>
+      <div class="popup-sub">${escapeHtml(industry)} · ${escapeHtml(country)}</div>
+      <div class="popup-stat">Schools within <strong>1 km</strong>: <strong>${escapeHtml(n1)}</strong></div>
+      <div class="popup-stat">Schools within <strong>5 km</strong>: <strong>${escapeHtml(n5)}</strong></div>
       ${schools1.length ? `<div class="school-list">${schoolList}${moreNote}</div>` : ''}
     `, {maxWidth: 280});
     m._cgdAction = ['detail_open', 'site_popup', industry];
@@ -384,9 +394,9 @@ function renderSchools1(filterCountry='', filterIndustry='') {
       radius: 6, color: '#fff', weight: 0.8, fillColor: '#ff4444', fillOpacity: 0.9
     });
     m.bindPopup(`
-      <div class="popup-title">🏫 ${name}</div>
-      <div class="popup-sub">${country}</div>
-      <div class="popup-stat">Distance to nearest site: <strong>${dist} km</strong></div>
+      <div class="popup-title">🏫 ${escapeHtml(name)}</div>
+      <div class="popup-sub">${escapeHtml(country)}</div>
+      <div class="popup-stat">Distance to nearest site: <strong>${escapeHtml(dist)} km</strong></div>
       <div class="popup-stat" style="color:#ff6666;font-weight:600">⚠️ Within 1 km of polluted site</div>
     `);
     m._cgdAction = ['detail_open', 'school_1km_popup', country];
@@ -434,9 +444,9 @@ function load5kmSchools(filterCountry='') {
           radius: 5, color: '#fff', weight: 0.5, fillColor: '#ffaa22', fillOpacity: 0.75
         });
         m.bindPopup(`
-          <div class="popup-title">🏫 ${name}</div>
-          <div class="popup-sub">${country}</div>
-          <div class="popup-stat">Distance to nearest site: <strong>${dist} km</strong></div>
+          <div class="popup-title">🏫 ${escapeHtml(name)}</div>
+          <div class="popup-sub">${escapeHtml(country)}</div>
+          <div class="popup-stat">Distance to nearest site: <strong>${escapeHtml(dist)} km</strong></div>
           <div class="popup-stat" style="color:#ffaa22;font-weight:600">⚠️ Within 1–5 km of polluted site</div>
         `);
         m._cgdAction = ['detail_open', 'school_5km_popup', country];

@@ -34,6 +34,33 @@ The map displays TSIP pollution sites alongside school locations for countries c
 
 ---
 
+## Technical details
+
+This is a static, client-side map hosted on **GitHub Pages** at:
+
+**<https://center-for-global-development.github.io/toxic-schools-map/>**
+
+There is no build step or application framework. The app consists of `index.html`, `tracking.js`, and three local JSON data files:
+
+- `sites_data.json` — polluted-site markers and per-site school counts
+- `schools_1km_data.json` — school markers within 1 km, loaded on initial page load
+- `schools_5km_data.json` — school markers 1-5 km from sites, lazy-loaded when the layer is enabled
+
+External libraries and services loaded by the map:
+
+- [Leaflet](https://leafletjs.com/) — map rendering and interaction
+- [Leaflet.markercluster](https://github.com/Leaflet/Leaflet.markercluster) — marker clustering for school layers
+- [topojson-client](https://github.com/topojson/topojson-client) and [world-atlas](https://github.com/topojson/world-atlas) — country-boundary overlay for highlighted map coverage
+- [CARTO basemaps](https://carto.com/basemaps/) — dark basemap tiles, built from OpenStreetMap data
+- [Google Fonts](https://fonts.google.com/) — Inter font
+- [jsDelivr](https://www.jsdelivr.com/) — CDN for Leaflet, markercluster, topojson-client, and world-atlas assets
+
+The map is designed to be embedded in a CGD article via iframe. `tracking.js` sends lightweight interaction events to the parent `https://www.cgdev.org` page using `window.parent.postMessage(...)`; the parent site is responsible for forwarding those events to analytics. See `TRACKING.md` for the event schema.
+
+Because GitHub Pages serves this as a static site, deployment is simply a push to the repository branch configured for Pages. There is no server-side code, database, or API dependency beyond the external tile/CDN/font requests listed above.
+
+---
+
 ## Data sources
 
 ### Contaminated sites — Pure Earth TSIP

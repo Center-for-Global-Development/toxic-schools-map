@@ -168,6 +168,10 @@
     <span class="dot" style="background:rgba(232,112,64,0.35); border:1px solid #e87040" aria-hidden="true"></span>
     <span>5km buffer circles</span>
   </label>
+  <div class="toggle-row" style="margin-top:4px;cursor:default;">
+    <span class="dot" style="background:rgba(255,181,44,0.35); border:1px solid rgba(255,181,44,0.6)" aria-hidden="true"></span>
+    <span style="color:#aaa;">Countries with school data</span>
+  </div>
 
   <div class="section-label" id="filter-heading">Filter</div>
 
@@ -204,6 +208,8 @@
         crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"
         integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"
         crossorigin="anonymous"></script>
 <script src="tracking.js"></script>
 <script>
@@ -253,6 +259,43 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '©<a href="https://www.openstreetmap.org/copyright">OSM</a> ©<a href="https://carto.com">CARTO</a>',
   subdomains: 'abcd', maxZoom: 19
 }).addTo(map);
+
+// ── Paper-country highlight ───────────────────────────────────────────────────
+// ISO numeric IDs for the 17 paper countries. Light tint signals "data exists
+// here" so blank areas read as "no data" not "no problem".
+const PAPER_ISO = new Set([
+  32,   // Argentina
+  50,   // Bangladesh
+  51,   // Armenia
+  76,   // Brazil
+  116,  // Cambodia
+  170,  // Colombia
+  288,  // Ghana
+  356,  // India
+  360,  // Indonesia
+  398,  // Kazakhstan
+  404,  // Kenya
+  417,  // Kyrgyzstan
+  484,  // Mexico
+  496,  // Mongolia
+  586,  // Pakistan
+  604,  // Peru
+  608,  // Philippines
+  704,  // Vietnam
+  858   // Uruguay
+]);
+fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+  .then(r => r.json())
+  .then(world => {
+    const geojson = topojson.feature(world, world.objects.countries);
+    L.geoJSON(geojson, {
+      style: f => PAPER_ISO.has(+f.id)
+        ? { fillColor: '#FFB52C', fillOpacity: 0.10, color: '#FFB52C', weight: 0.6, opacity: 0.35, interactive: false }
+        : { fillOpacity: 0, color: 'transparent', weight: 0, interactive: false },
+      interactive: false
+    }).addTo(map);
+  })
+  .catch(() => {}); // silently skip if offline
 
 // ── Layer groups ─────────────────────────────────────────────────────────────
 const siteLayer    = L.layerGroup().addTo(map);

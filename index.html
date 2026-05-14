@@ -263,8 +263,10 @@ function showToast(message, opts) {
 // ── Data (loaded from JSON) ─────────────────────────────────────────────
 // SITES format:   [lat, lon, name, industry, country, site_id, n1km, n5km]
 // SCHOOL1 format: [lat, lon, name, country, dist_km, site_id]
+// SCHOOL5 format: [lat, lon, name, country, dist_km, site_id]
 let SITES = [];
 let SCHOOL1 = [];
+let SCHOOL5 = [];
 
 // ── Industry colours ─────────────────────────────────────────────────────────
 const IND_COLOR = {
@@ -430,6 +432,28 @@ function renderSchools1(filterCountry='', filterIndustry='') {
   cluster1km.addLayers(markers);
 }
 
+// ── Render 5km schools ───────────────────────────────────────────────────────
+function renderSchools5(filterCountry='') {
+  cluster5km.clearLayers();
+  const markers = [];
+  SCHOOL5.forEach(s => {
+    const [lat, lon, name, country, dist] = s;
+    if (filterCountry && country !== filterCountry) return;
+    const m = L.circleMarker([lat, lon], {
+      radius: 5, color: '#fff', weight: 0.5, fillColor: '#ffb52c', fillOpacity: 0.75
+    });
+    m.bindPopup(`
+      <div class="popup-title">🏫 ${escapeHtml(name)}</div>
+      <div class="popup-sub">${escapeHtml(country)}</div>
+      <div class="popup-stat">Distance to nearest site: <strong>${escapeHtml(dist)} km</strong></div>
+      <div class="popup-stat" style="color:#ffb52c;font-weight:600">⚠️ Within 1–5 km of polluted site</div>
+    `);
+    m._cgdAction = ['detail_open', 'school_5km_popup', country];
+    markers.push(m);
+  });
+  cluster5km.addLayers(markers);
+}
+
 // ── Render 5km buffer circles ────────────────────────────────────────────────
 function renderBuffers() {
   bufferLayer.clearLayers();
@@ -448,7 +472,7 @@ function renderBuffers() {
 }
 
 // ── Lazy-load 5km schools ────────────────────────────────────────────────────
-function load5kmSchools(filterCountry='') {
+function load5kmSchools() {
   if (state.s5kmLoaded) return;
   const loading = document.getElementById('loading');
   loading.querySelector('.spinner').nextSibling.textContent = ' Loading 5km school data…';
@@ -461,24 +485,9 @@ function load5kmSchools(filterCountry='') {
     })
     .then(data => {
       loading.style.display = 'none';
-      const markers = [];
-      data.forEach(s => {
-        const [lat, lon, name, country, dist] = s;
-        if (filterCountry && country !== filterCountry) return;
-        const m = L.circleMarker([lat, lon], {
-          radius: 5, color: '#fff', weight: 0.5, fillColor: '#ffb52c', fillOpacity: 0.75
-        });
-        m.bindPopup(`
-          <div class="popup-title">🏫 ${escapeHtml(name)}</div>
-          <div class="popup-sub">${escapeHtml(country)}</div>
-          <div class="popup-stat">Distance to nearest site: <strong>${escapeHtml(dist)} km</strong></div>
-          <div class="popup-stat" style="color:#ffb52c;font-weight:600">⚠️ Within 1–5 km of polluted site</div>
-        `);
-        m._cgdAction = ['detail_open', 'school_5km_popup', country];
-        markers.push(m);
-      });
-      cluster5km.addLayers(markers);
+      SCHOOL5 = data;
       state.s5kmLoaded = true;
+      renderSchools5(document.getElementById('country-filter').value);
     })
     .catch(() => {
       loading.style.display = 'none';
@@ -500,7 +509,7 @@ function toggleLayer(key) {
   CGDTracking.trackEngagement('filter', LAYER_TRACK_LABEL[key], state[key] ? 'on' : 'off');
   if (state[key]) {
     if (key === 's5km' && !state.s5kmLoaded) {
-      load5kmSchools(document.getElementById('country-filter').value);
+      load5kmSchools();
       map.addLayer(cluster5km);
     } else {
       map.addLayer(layers[key]);
@@ -521,6 +530,7 @@ function applyFilters() {
   const fi = document.getElementById('industry-filter').value;
   renderSites(fc, fi);
   renderSchools1(fc, fi);
+  if (state.s5kmLoaded) renderSchools5(fc);
 }
 
 // ── Popup-open tracking ──────────────────────────────────────────────────────

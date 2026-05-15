@@ -304,6 +304,38 @@
 // Fire view event as early as possible; trackView is idempotent.
 CGDTracking.trackView();
 
+// ── Parent iframe resizing ───────────────────────────────────────────────────
+// CGD article pages listen for this message and set the iframe height.
+function getEmbedHeight() {
+  const width = document.documentElement.clientWidth || window.innerWidth || 0;
+  const mobileSheet = window.matchMedia('(max-width: 500px)').matches;
+  if (mobileSheet) {
+    return Math.max(620, Math.min(760, Math.round(width * 1.55)));
+  }
+  return Math.max(560, Math.min(760, Math.round(width * 0.62)));
+}
+
+let resizeQueued = false;
+function reportIframeHeight() {
+  if (window.parent === window || resizeQueued) return;
+  resizeQueued = true;
+  requestAnimationFrame(() => {
+    resizeQueued = false;
+    window.parent.postMessage({
+      type: 'cgd-iframe-resize',
+      height: getEmbedHeight()
+    }, '*');
+  });
+}
+
+window.addEventListener('load', reportIframeHeight);
+window.addEventListener('resize', reportIframeHeight);
+window.addEventListener('orientationchange', () => setTimeout(reportIframeHeight, 250));
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', reportIframeHeight);
+}
+reportIframeHeight();
+
 // ── Toast helper ─────────────────────────────────────────────────────────────
 // Persistent toasts stay until dismissed; transient ones auto-remove after 6s.
 function showToast(message, opts) {
@@ -589,6 +621,8 @@ function toggleMobileSheet(forceOpen) {
   const open = forceOpen === undefined ? !panel.classList.contains('open') : forceOpen;
   panel.classList.toggle('open', open);
   btn.setAttribute('aria-expanded', String(open));
+  reportIframeHeight();
+  setTimeout(reportIframeHeight, 250);
 }
 
 // ── Filter apply ─────────────────────────────────────────────────────────────
@@ -629,9 +663,11 @@ map.on('popupopen', (e) => {
     renderSchools1();
     renderBuffers();
     loading.style.display = 'none';
+    reportIframeHeight();
   }).catch(err => {
     loading.style.display = 'none';
     showToast('Failed to load map data (' + err.message + '). Please reload the page.', { persistent: true });
+    reportIframeHeight();
   });
 })();
 

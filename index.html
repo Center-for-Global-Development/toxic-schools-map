@@ -75,6 +75,30 @@
     letter-spacing: 0.7px; margin-bottom: 7px; }
   .legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 11px; }
 
+  /* Zoom controls */
+  .leaflet-control-zoom {
+    border: 1px solid rgba(255,255,255,0.14) !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.45);
+  }
+  .leaflet-control-zoom a {
+    width: 32px !important; height: 32px !important; line-height: 31px !important;
+    background: rgba(15,15,30,0.94) !important;
+    color: #ffb52c !important;
+    border-color: rgba(255,255,255,0.12) !important;
+    font-size: 20px !important;
+  }
+  .leaflet-control-zoom a:hover,
+  .leaflet-control-zoom a:focus-visible {
+    background: rgba(255,181,44,0.18) !important;
+    color: #ffd27a !important;
+  }
+  .leaflet-control-zoom a:focus-visible {
+    outline: 2px solid #ffb52c;
+    outline-offset: -2px;
+  }
+
   /* Popup */
   .leaflet-popup-content-wrapper { background: #1e1e35; border: 1px solid rgba(255,255,255,0.12);
     color: #ddd; border-radius: 8px; }
@@ -122,6 +146,63 @@
     from { transform: translateX(16px); opacity: 0; }
     to   { transform: translateX(0);    opacity: 1; }
   }
+
+  .sheet-toggle { display: none; }
+
+  @media (max-width: 500px) {
+    #panel {
+      position: fixed; top: auto; left: 0; right: 0; bottom: 0;
+      width: 100%; max-height: 78vh; padding: 0 16px 16px;
+      border-radius: 14px 14px 0 0;
+      border-right: 0; border-bottom: 0; border-left: 0;
+      transform: translateY(calc(100% - 64px));
+      transition: transform 220ms ease;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    #panel.open { transform: translateY(0); }
+    .sheet-toggle {
+      position: sticky; top: 0; z-index: 1;
+      display: flex; align-items: center; justify-content: space-between;
+      width: calc(100% + 32px); min-height: 56px; margin: 0 -16px 12px;
+      padding: 8px 16px 10px;
+      background: rgba(15,15,30,0.98);
+      border: 0; border-bottom: 1px solid rgba(255,255,255,0.10);
+      color: #e0e0e0; cursor: pointer; font: inherit; text-align: left;
+    }
+    .sheet-toggle::before {
+      content: ''; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+      width: 42px; height: 4px; border-radius: 999px; background: rgba(255,255,255,0.25);
+    }
+    .sheet-toggle .sheet-title {
+      display: block; color: #ffb52c; font-size: 12px; font-weight: 700;
+      letter-spacing: 0.5px; text-transform: uppercase; padding-top: 8px;
+    }
+    .sheet-toggle .sheet-status {
+      color: #aaa; font-size: 11px; padding-top: 8px;
+    }
+    .sheet-toggle .sheet-icon {
+      color: #ffb52c; font-size: 18px; line-height: 1; padding-top: 8px;
+    }
+    #panel.open .sheet-icon { transform: rotate(180deg); }
+    .sheet-toggle:focus-visible {
+      outline: 2px solid #ffb52c;
+      outline-offset: -4px;
+    }
+    #panel h2 { font-size: 12px; }
+    #panel p.sub { margin-bottom: 10px; }
+    .stat-row { gap: 5px; }
+    .stat { padding: 6px 5px; }
+    .stat .n { font-size: 15px; }
+    .stat .l { font-size: 9px; }
+    .toggle-row span { font-size: 12.5px; }
+    select { min-height: 34px; font-size: 13px; }
+    #legend { display: none; }
+    #toast-container {
+      top: 10px; right: 10px; left: 10px; max-width: none;
+    }
+    .leaflet-bottom.leaflet-left { bottom: 62px; }
+  }
 </style>
 </head>
 <body>
@@ -137,8 +218,15 @@
 
 <!-- ── Side panel ── -->
 <div id="panel">
+  <button class="sheet-toggle" type="button" aria-expanded="false" aria-controls="panel" onclick="toggleMobileSheet()">
+    <span>
+      <span class="sheet-title">Toxic Schools</span>
+      <span class="sheet-status">Layers &amp; filters</span>
+    </span>
+    <span class="sheet-icon" aria-hidden="true">⌃</span>
+  </button>
   <h2>☠️ TOXIC SCHOOLS</h2>
-  <p class="sub">School proximity to polluted sites in LMICs &mdash; <a href="https://www.cgdev.org" style="color:#FFB52C;text-decoration:none;" target="_blank" onclick="CGDTracking.trackEngagement('external_link','paper')">Paper ↗</a> &middot; <a href="https://github.com/Center-for-Global-Development/toxic-schools-map#readme" style="color:#FFB52C;text-decoration:none;" target="_blank" onclick="CGDTracking.trackEngagement('external_link','readme')">Data &amp; methods ↗</a></p>
+  <p class="sub">School proximity to polluted sites in LMICs &mdash; <a href="https://www.cgdev.org/publication/toxic-schools-proximity-polluted-sites-17-low-and-middle-income-countries" style="color:#FFB52C;text-decoration:none;" target="_blank" onclick="CGDTracking.trackEngagement('external_link','paper')">Paper ↗</a> &middot; <a href="https://github.com/Center-for-Global-Development/toxic-schools-map#readme" style="color:#FFB52C;text-decoration:none;" target="_blank" onclick="CGDTracking.trackEngagement('external_link','readme')">Data &amp; methods ↗</a></p>
 
   <div class="stat-row">
     <div class="stat"><div class="n" id="s-sites">3,180</div><div class="l">Polluted sites</div></div>
@@ -150,7 +238,7 @@
 
   <label class="toggle-row">
     <input type="checkbox" id="chk-sites" checked onchange="toggleLayer('sites')">
-    <span class="dot" style="background:#e87040" aria-hidden="true"></span>
+    <span class="dot" style="background:linear-gradient(90deg,#fee8bf 0 20%,#2d99b5 20% 40%,#0b4c5b 40% 60%,#bfdee0 60% 80%,#00896c 80% 100%)" aria-hidden="true"></span>
     <span>Polluted sites (TSIP)</span>
   </label>
   <label class="toggle-row">
@@ -161,11 +249,11 @@
   <label class="toggle-row">
     <input type="checkbox" id="chk-s5km" onchange="toggleLayer('s5km')">
     <span class="dot" style="background:#ffb52c" aria-hidden="true"></span>
-    <span>Schools 1–5 km <small style="color:#666">(loads ~8MB)</small></span>
+    <span>Schools 1–5 km <small style="color:#666">(loads ~11MB)</small></span>
   </label>
   <label class="toggle-row">
     <input type="checkbox" id="chk-buffers" onchange="toggleLayer('buffers')">
-    <span class="dot" style="background:rgba(232,112,64,0.35); border:1px solid #e87040" aria-hidden="true"></span>
+    <span class="dot" style="background:rgba(11,76,91,0.35); border:1px solid #0B4C5B" aria-hidden="true"></span>
     <span>5km buffer circles</span>
   </label>
   <div class="toggle-row" style="margin-top:4px;cursor:default;">
@@ -193,14 +281,14 @@
 <!-- ── Legend ── -->
 <div id="legend">
   <h4>Site industry</h4>
-  <div class="legend-row"><span class="dot" style="background:#e8a020"></span> Battery (ULAB)</div>
-  <div class="legend-row"><span class="dot" style="background:#4a90d9"></span> Manufacturing</div>
-  <div class="legend-row"><span class="dot" style="background:#7b4f9e"></span> Mining & smelting</div>
-  <div class="legend-row"><span class="dot" style="background:#888"></span> Other</div>
-  <div class="legend-row"><span class="dot" style="background:#2ecc71"></span> Recycling & waste</div>
+  <div class="legend-row"><span class="dot" style="background:#fee8bf"></span> Battery (ULAB)</div>
+  <div class="legend-row"><span class="dot" style="background:#2d99b5"></span> Manufacturing</div>
+  <div class="legend-row"><span class="dot" style="background:#0b4c5b"></span> Mining & smelting</div>
+  <div class="legend-row"><span class="dot" style="background:#bfdee0"></span> Other</div>
+  <div class="legend-row"><span class="dot" style="background:#00896c"></span> Recycling & waste</div>
   <hr style="border-color:rgba(255,255,255,0.1);margin:7px 0">
-  <div class="legend-row"><span class="dot" style="background:#ff4444"></span> School &lt;1km</div>
-  <div class="legend-row"><span class="dot" style="background:#ffaa22"></span> School 1–5km</div>
+  <div class="legend-row"><span class="dot" style="background:#d15553"></span> School &lt;1km</div>
+  <div class="legend-row"><span class="dot" style="background:#ffb52c"></span> School 1–5km</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"
@@ -215,6 +303,38 @@
 <script>
 // Fire view event as early as possible; trackView is idempotent.
 CGDTracking.trackView();
+
+// ── Parent iframe resizing ───────────────────────────────────────────────────
+// CGD article pages listen for this message and set the iframe height.
+function getEmbedHeight() {
+  const width = document.documentElement.clientWidth || window.innerWidth || 0;
+  const mobileSheet = window.matchMedia('(max-width: 500px)').matches;
+  if (mobileSheet) {
+    return Math.max(620, Math.min(760, Math.round(width * 1.55)));
+  }
+  return Math.max(560, Math.min(760, Math.round(width * 0.62)));
+}
+
+let resizeQueued = false;
+function reportIframeHeight() {
+  if (window.parent === window || resizeQueued) return;
+  resizeQueued = true;
+  requestAnimationFrame(() => {
+    resizeQueued = false;
+    window.parent.postMessage({
+      type: 'cgd-iframe-resize',
+      height: getEmbedHeight()
+    }, '*');
+  });
+}
+
+window.addEventListener('load', reportIframeHeight);
+window.addEventListener('resize', reportIframeHeight);
+window.addEventListener('orientationchange', () => setTimeout(reportIframeHeight, 250));
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', reportIframeHeight);
+}
+reportIframeHeight();
 
 // ── Toast helper ─────────────────────────────────────────────────────────────
 // Persistent toasts stay until dismissed; transient ones auto-remove after 6s.
@@ -239,21 +359,24 @@ function showToast(message, opts) {
 // ── Data (loaded from JSON) ─────────────────────────────────────────────
 // SITES format:   [lat, lon, name, industry, country, site_id, n1km, n5km]
 // SCHOOL1 format: [lat, lon, name, country, dist_km, site_id]
+// SCHOOL5 format: [lat, lon, name, country, dist_km, site_id]
 let SITES = [];
 let SCHOOL1 = [];
+let SCHOOL5 = [];
 
 // ── Industry colours ─────────────────────────────────────────────────────────
 const IND_COLOR = {
-  'Battery (ULAB)':  '#e8a020',
-  'Manufacturing':   '#4a90d9',
-  'Mining & smelting': '#9b6dbf',
-  'Other':           '#888888',
-  'Recycling & waste': '#2ecc71'
+  'Battery (ULAB)':  '#fee8bf',
+  'Manufacturing':   '#2d99b5',
+  'Mining & smelting': '#0b4c5b',
+  'Other':           '#bfdee0',
+  'Recycling & waste': '#00896c'
 };
 const indColor = g => IND_COLOR[g] || '#888';
 
 // ── Map init ─────────────────────────────────────────────────────────────────
-const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([10, 20], 3);
+const map = L.map('map', { zoomControl: false, preferCanvas: true }).setView([10, 20], 3);
+L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '©<a href="https://www.openstreetmap.org/copyright">OSM</a> ©<a href="https://carto.com">CARTO</a>',
@@ -300,10 +423,10 @@ fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
 // ── Layer groups ─────────────────────────────────────────────────────────────
 const siteLayer    = L.layerGroup().addTo(map);
 const cluster1km   = L.markerClusterGroup({ maxClusterRadius: 40, disableClusteringAtZoom: 13, chunkedLoading: true,
-  iconCreateFunction: c => L.divIcon({html:`<div style="background:#a03030;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #d15553">${c.getChildCount()}</div>`,className:'',iconSize:[28,28]})
+  iconCreateFunction: c => L.divIcon({html:`<div style="background:#d15553;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #d15553">${c.getChildCount()}</div>`,className:'',iconSize:[28,28]})
 }).addTo(map);
 const cluster5km   = L.markerClusterGroup({ maxClusterRadius: 40, disableClusteringAtZoom: 13, chunkedLoading: true,
-  iconCreateFunction: c => L.divIcon({html:`<div style="background:#b07800;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #ffb52c">${c.getChildCount()}</div>`,className:'',iconSize:[28,28]})
+  iconCreateFunction: c => L.divIcon({html:`<div style="background:#ffb52c;color:#1a1a2e;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #ffb52c">${c.getChildCount()}</div>`,className:'',iconSize:[28,28]})
 });
 const bufferLayer  = L.layerGroup();
 
@@ -323,6 +446,16 @@ function buildSiteTo1km() {
     if (!siteTo1km[sid]) siteTo1km[sid] = [];
     siteTo1km[sid].push(s);
   });
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[ch]);
 }
 
 // ── Populate country filter (built after data loads) ────────────────────────
@@ -354,15 +487,15 @@ function renderSites(filterCountry='', filterIndustry='') {
     });
     const schools1 = siteTo1km[sid] || [];
     const schoolList = schools1.slice(0, 10).map(sc =>
-      `<div class="school-item">🏫 ${sc[2]} <span style="color:#888">(${sc[4]} km)</span></div>`
+      `<div class="school-item">🏫 ${escapeHtml(sc[2])} <span style="color:#888">(${escapeHtml(sc[4])} km)</span></div>`
     ).join('');
     const moreNote = schools1.length > 10 ? `<div style="font-size:10px;color:#666;margin-top:3px">…and ${schools1.length-10} more</div>` : '';
 
     m.bindPopup(`
-      <div class="popup-title">${name}</div>
-      <div class="popup-sub">${industry} · ${country}</div>
-      <div class="popup-stat">Schools within <strong>1 km</strong>: <strong>${n1}</strong></div>
-      <div class="popup-stat">Schools within <strong>5 km</strong>: <strong>${n5}</strong></div>
+      <div class="popup-title">${escapeHtml(name)}</div>
+      <div class="popup-sub">${escapeHtml(industry)} · ${escapeHtml(country)}</div>
+      <div class="popup-stat">Schools within <strong>1 km</strong>: <strong>${escapeHtml(n1)}</strong></div>
+      <div class="popup-stat">Schools within <strong>5 km</strong>: <strong>${escapeHtml(n5)}</strong></div>
       ${schools1.length ? `<div class="school-list">${schoolList}${moreNote}</div>` : ''}
     `, {maxWidth: 280});
     m._cgdAction = ['detail_open', 'site_popup', industry];
@@ -381,18 +514,40 @@ function renderSchools1(filterCountry='', filterIndustry='') {
     const [lat, lon, name, country, dist, sid] = s;
     if (filterCountry && country !== filterCountry) return;
     const m = L.circleMarker([lat, lon], {
-      radius: 6, color: '#fff', weight: 0.8, fillColor: '#ff4444', fillOpacity: 0.9
+      radius: 6, color: '#fff', weight: 0.8, fillColor: '#d15553', fillOpacity: 0.9
     });
     m.bindPopup(`
-      <div class="popup-title">🏫 ${name}</div>
-      <div class="popup-sub">${country}</div>
-      <div class="popup-stat">Distance to nearest site: <strong>${dist} km</strong></div>
-      <div class="popup-stat" style="color:#ff6666;font-weight:600">⚠️ Within 1 km of polluted site</div>
+      <div class="popup-title">🏫 ${escapeHtml(name)}</div>
+      <div class="popup-sub">${escapeHtml(country)}</div>
+      <div class="popup-stat">Distance to nearest site: <strong>${escapeHtml(dist)} km</strong></div>
+      <div class="popup-stat" style="color:#d15553;font-weight:600">⚠️ Within 1 km of polluted site</div>
     `);
     m._cgdAction = ['detail_open', 'school_1km_popup', country];
     markers.push(m);
   });
   cluster1km.addLayers(markers);
+}
+
+// ── Render 5km schools ───────────────────────────────────────────────────────
+function renderSchools5(filterCountry='') {
+  cluster5km.clearLayers();
+  const markers = [];
+  SCHOOL5.forEach(s => {
+    const [lat, lon, name, country, dist] = s;
+    if (filterCountry && country !== filterCountry) return;
+    const m = L.circleMarker([lat, lon], {
+      radius: 5, color: '#fff', weight: 0.5, fillColor: '#ffb52c', fillOpacity: 0.75
+    });
+    m.bindPopup(`
+      <div class="popup-title">🏫 ${escapeHtml(name)}</div>
+      <div class="popup-sub">${escapeHtml(country)}</div>
+      <div class="popup-stat">Distance to nearest site: <strong>${escapeHtml(dist)} km</strong></div>
+      <div class="popup-stat" style="color:#ffb52c;font-weight:600">⚠️ Within 1–5 km of polluted site</div>
+    `);
+    m._cgdAction = ['detail_open', 'school_5km_popup', country];
+    markers.push(m);
+  });
+  cluster5km.addLayers(markers);
 }
 
 // ── Render 5km buffer circles ────────────────────────────────────────────────
@@ -401,19 +556,19 @@ function renderBuffers() {
   SITES.forEach(s => {
     const [lat, lon,,, , sid, n1, n5] = s;
     if (n5 === 0) return;
-    L.circle([lat, lon], { radius: 5000, color: '#e87040', weight: 1,
-      fillColor: '#e87040', fillOpacity: 0.05, interactive: false
+    L.circle([lat, lon], { radius: 5000, color: '#0B4C5B', weight: 1,
+      fillColor: '#0B4C5B', fillOpacity: 0.05, interactive: false
     }).addTo(bufferLayer);
     if (n1 > 0) {
-      L.circle([lat, lon], { radius: 1000, color: '#ff4444', weight: 1,
-        fillColor: '#ff4444', fillOpacity: 0.08, interactive: false
+      L.circle([lat, lon], { radius: 1000, color: '#0B4C5B', weight: 1.5,
+        fillColor: '#0B4C5B', fillOpacity: 0.12, interactive: false
       }).addTo(bufferLayer);
     }
   });
 }
 
 // ── Lazy-load 5km schools ────────────────────────────────────────────────────
-function load5kmSchools(filterCountry='') {
+function load5kmSchools() {
   if (state.s5kmLoaded) return;
   const loading = document.getElementById('loading');
   loading.querySelector('.spinner').nextSibling.textContent = ' Loading 5km school data…';
@@ -426,24 +581,9 @@ function load5kmSchools(filterCountry='') {
     })
     .then(data => {
       loading.style.display = 'none';
-      const markers = [];
-      data.forEach(s => {
-        const [lat, lon, name, country, dist] = s;
-        if (filterCountry && country !== filterCountry) return;
-        const m = L.circleMarker([lat, lon], {
-          radius: 5, color: '#fff', weight: 0.5, fillColor: '#ffaa22', fillOpacity: 0.75
-        });
-        m.bindPopup(`
-          <div class="popup-title">🏫 ${name}</div>
-          <div class="popup-sub">${country}</div>
-          <div class="popup-stat">Distance to nearest site: <strong>${dist} km</strong></div>
-          <div class="popup-stat" style="color:#ffaa22;font-weight:600">⚠️ Within 1–5 km of polluted site</div>
-        `);
-        m._cgdAction = ['detail_open', 'school_5km_popup', country];
-        markers.push(m);
-      });
-      cluster5km.addLayers(markers);
+      SCHOOL5 = data;
       state.s5kmLoaded = true;
+      renderSchools5(document.getElementById('country-filter').value);
     })
     .catch(() => {
       loading.style.display = 'none';
@@ -465,7 +605,7 @@ function toggleLayer(key) {
   CGDTracking.trackEngagement('filter', LAYER_TRACK_LABEL[key], state[key] ? 'on' : 'off');
   if (state[key]) {
     if (key === 's5km' && !state.s5kmLoaded) {
-      load5kmSchools(document.getElementById('country-filter').value);
+      load5kmSchools();
       map.addLayer(cluster5km);
     } else {
       map.addLayer(layers[key]);
@@ -473,6 +613,16 @@ function toggleLayer(key) {
   } else {
     map.removeLayer(layers[key]);
   }
+}
+
+function toggleMobileSheet(forceOpen) {
+  const panel = document.getElementById('panel');
+  const btn = panel.querySelector('.sheet-toggle');
+  const open = forceOpen === undefined ? !panel.classList.contains('open') : forceOpen;
+  panel.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', String(open));
+  reportIframeHeight();
+  setTimeout(reportIframeHeight, 250);
 }
 
 // ── Filter apply ─────────────────────────────────────────────────────────────
@@ -486,6 +636,7 @@ function applyFilters() {
   const fi = document.getElementById('industry-filter').value;
   renderSites(fc, fi);
   renderSchools1(fc, fi);
+  if (state.s5kmLoaded) renderSchools5(fc);
 }
 
 // ── Popup-open tracking ──────────────────────────────────────────────────────
@@ -512,9 +663,11 @@ map.on('popupopen', (e) => {
     renderSchools1();
     renderBuffers();
     loading.style.display = 'none';
+    reportIframeHeight();
   }).catch(err => {
     loading.style.display = 'none';
     showToast('Failed to load map data (' + err.message + '). Please reload the page.', { persistent: true });
+    reportIframeHeight();
   });
 })();
 

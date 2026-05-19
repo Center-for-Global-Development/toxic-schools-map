@@ -238,7 +238,7 @@
 
   <label class="toggle-row">
     <input type="checkbox" id="chk-sites" checked onchange="toggleLayer('sites')">
-    <span class="dot" style="background:#e87040" aria-hidden="true"></span>
+    <span class="dot" style="background:linear-gradient(90deg,#fee8bf 0 20%,#2d99b5 20% 40%,#0b4c5b 40% 60%,#bfdee0 60% 80%,#00896c 80% 100%)" aria-hidden="true"></span>
     <span>Polluted sites (TSIP)</span>
   </label>
   <label class="toggle-row">
@@ -249,11 +249,11 @@
   <label class="toggle-row">
     <input type="checkbox" id="chk-s5km" onchange="toggleLayer('s5km')">
     <span class="dot" style="background:#ffb52c" aria-hidden="true"></span>
-    <span>Schools 1–5 km <small style="color:#666">(loads ~8MB)</small></span>
+    <span>Schools 1–5 km <small style="color:#666">(loads ~11MB)</small></span>
   </label>
   <label class="toggle-row">
     <input type="checkbox" id="chk-buffers" onchange="toggleLayer('buffers')">
-    <span class="dot" style="background:rgba(232,112,64,0.35); border:1px solid #e87040" aria-hidden="true"></span>
+    <span class="dot" style="background:rgba(11,76,91,0.35); border:1px solid #0B4C5B" aria-hidden="true"></span>
     <span>5km buffer circles</span>
   </label>
   <div class="toggle-row" style="margin-top:4px;cursor:default;">
@@ -556,12 +556,12 @@ function renderBuffers() {
   SITES.forEach(s => {
     const [lat, lon,,, , sid, n1, n5] = s;
     if (n5 === 0) return;
-    L.circle([lat, lon], { radius: 5000, color: '#e87040', weight: 1,
-      fillColor: '#e87040', fillOpacity: 0.05, interactive: false
+    L.circle([lat, lon], { radius: 5000, color: '#0B4C5B', weight: 1,
+      fillColor: '#0B4C5B', fillOpacity: 0.05, interactive: false
     }).addTo(bufferLayer);
     if (n1 > 0) {
-      L.circle([lat, lon], { radius: 1000, color: '#d15553', weight: 1,
-        fillColor: '#d15553', fillOpacity: 0.08, interactive: false
+      L.circle([lat, lon], { radius: 1000, color: '#0B4C5B', weight: 1.5,
+        fillColor: '#0B4C5B', fillOpacity: 0.12, interactive: false
       }).addTo(bufferLayer);
     }
   });

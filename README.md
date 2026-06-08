@@ -4,7 +4,7 @@ Interactive map for the CGD working paper **"Schools in the Shadow of Toxic Site
 
 **[→ Open the map](https://center-for-global-development.github.io/toxic-schools-map/)**  
 **[→ CGD Working Paper](https://www.cgdev.org/publication/toxic-schools-proximity-polluted-sites-17-low-and-middle-income-countries)**  
-**[→ Replication data (Zenodo)](https://doi.org/10.5281/zenodo.19359188)**
+**[→ Replication data (Zenodo)](https://doi.org/10.5281/zenodo.19359187)**
 
 ---
 
@@ -105,7 +105,7 @@ The paper uses the **Meta Relative Wealth Index (RWI)** ([Chi et al., 2022](http
 
 All analysis code, school census data, TSIP data, government contaminated site registers, and generated tables and figures are archived at:
 
-**<https://doi.org/10.5281/zenodo.19359188>**
+**<https://doi.org/10.5281/zenodo.19359187>**
 
 ---
 
@@ -114,7 +114,7 @@ All analysis code, school census data, TSIP data, government contaminated site r
 ```
 Crawfurd, Lee (2026). "Schools in the Shadow of Toxic Sites: Pollution
 Proximity in Low- and Middle-Income Countries." Center for Global Development Working Paper.
-https://doi.org/10.5281/zenodo.19359188
+https://doi.org/10.5281/zenodo.19359187
 ```
 
 ---

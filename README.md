@@ -11,9 +11,9 @@ Interactive map for the CGD working paper **"Schools in the Shadow of Toxic Site
 ## Key findings
 
 - **2,840** contaminated sites across 17 countries (TSIP)
-- **2.7 million** geocoded schools analysed
-- **171,348 schools (6.3%)** are within 5 km of a known polluted site — a lower bound
-- **9.9%** of students (7 countries with enrolment data) attend schools within 5 km
+- **2.6 million** geocoded schools analysed
+- **252,809 schools (9.7%)** are within 5 km of a documented contaminated site — a lower bound
+- **12.7%** of students (7 countries with enrolment data) attend schools within 5 km
 - Private schools are more proximate to polluted sites than public schools in **all 8 countries** with available breakdowns — the opposite of the US pattern, driven by co-location of private schools and industry in wealthy urban cores
 
 > **Note:** these figures measure *proximity* to documented sites, not confirmed exposure or health outcomes. The TSIP also includes inactive and legacy sites. Proximity is a necessary but not sufficient condition for exposure; estimates are best understood as indicators of potential risk identifying schools that warrant further environmental investigation.
@@ -25,12 +25,12 @@ Interactive map for the CGD working paper **"Schools in the Shadow of Toxic Site
 The map displays TSIP pollution sites alongside school locations for countries covered by the paper. Click any site to see its name, industry category, country, and nearby schools with distances.
 
 **Layers:**
-- **Polluted sites (TSIP)** — 3,180 sites in paper countries
+- **Polluted sites (TSIP)** — 2,970 sites in paper countries
 - **Schools within 1 km** — ~20,000 schools (clustered); on by default
-- **Schools 1–5 km** — ~158,000 additional schools; loaded on demand (~8 MB)
+- **Schools 1–5 km** — ~152,000 additional schools; loaded on demand (~8 MB)
 - **5 km buffer circles** — catchment rings around each site with at least one nearby school
 
-**Map coverage note:** schools are shown for countries covered by Overture Maps / OpenStreetMap in our dataset. Five paper countries (Argentina, Bangladesh, Mexico, Pakistan, Uruguay) use national EMIS data included in the paper's headline figures but not yet in the map layer.
+**Map coverage note:** schools are shown for countries covered by Overture Maps / OpenStreetMap in our dataset. Three paper countries (Argentina, Bangladesh, Mexico) use national EMIS data included in the paper's headline figures but not yet in the map layer.
 
 ---
 
@@ -86,8 +86,6 @@ The paper uses national school census (EMIS) data for 11 countries and Overture 
 | Kenya | NEMIS (Ministry of Education) | 26,197 | 2023 | ✓ |
 | Colombia | SISE (DANE) | 56,650 | 2024 | ✓ |
 | Bangladesh | LGED education facilities (HDX) | 78,129 | 2023 | — |
-| Pakistan | Punjab EMIS | — | — | — |
-| Uruguay | ANEP | — | — | — |
 | Vietnam | Overture Maps (Feb 2026) | 67,087 | 2026 | ✓ |
 | Cambodia | Overture Maps (Feb 2026) | 17,148 | 2026 | ✓ |
 | Kazakhstan | Overture Maps (Feb 2026) | 6,365 | 2026 | ✓ |

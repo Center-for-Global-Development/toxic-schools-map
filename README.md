@@ -1,6 +1,6 @@
-# Toxic Schools: Interactive Map
+# Schools in the Shadow of Toxic Sites: Interactive Map
 
-Interactive map for the CGD working paper **"Toxic Schools: Proximity to Polluted Sites in 17 Low- and Middle-Income Countries"** by Lee Crawfurd (Center for Global Development, 2026).
+Interactive map for the CGD working paper **"Schools in the Shadow of Toxic Sites: Pollution Proximity in Low- and Middle-Income Countries"** by Lee Crawfurd (Center for Global Development, 2026).
 
 **[→ Open the map](https://center-for-global-development.github.io/toxic-schools-map/)**  
 **[→ CGD Working Paper](https://www.cgdev.org/publication/toxic-schools-proximity-polluted-sites-17-low-and-middle-income-countries)**  
@@ -114,8 +114,8 @@ All analysis code, school census data, TSIP data, government contaminated site r
 ## Citation
 
 ```
-Crawfurd, Lee (2026). "Toxic Schools: Proximity to Polluted Sites in 17
-Low- and Middle-Income Countries." Center for Global Development Working Paper.
+Crawfurd, Lee (2026). "Schools in the Shadow of Toxic Sites: Pollution
+Proximity in Low- and Middle-Income Countries." Center for Global Development Working Paper.
 https://doi.org/10.5281/zenodo.19359188
 ```
 

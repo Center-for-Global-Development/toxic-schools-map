@@ -149,7 +149,7 @@
 
   .sheet-toggle { display: none; }
 
-  @media (max-width: 500px) {
+  @media (max-width: 700px) {
     #panel {
       position: fixed; top: auto; left: 0; right: 0; bottom: 0;
       width: 100%; max-height: 78vh; padding: 0 16px 16px;
@@ -308,7 +308,7 @@ CGDTracking.trackView();
 // CGD article pages listen for this message and set the iframe height.
 function getEmbedHeight() {
   const width = document.documentElement.clientWidth || window.innerWidth || 0;
-  const mobileSheet = window.matchMedia('(max-width: 500px)').matches;
+  const mobileSheet = window.matchMedia('(max-width: 700px)').matches;
   if (mobileSheet) {
     return Math.max(620, Math.min(760, Math.round(width * 1.55)));
   }

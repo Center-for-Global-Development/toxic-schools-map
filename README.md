@@ -30,7 +30,7 @@ The map displays TSIP pollution sites alongside school locations for countries c
 - **Schools 1–5 km** — ~152,000 additional schools; loaded on demand (~8 MB)
 - **5 km buffer circles** — catchment rings around each site with at least one nearby school
 
-**Map coverage note:** schools are shown for countries covered by Overture Maps / OpenStreetMap in our dataset. Three paper countries (Argentina, Bangladesh, Mexico) use national EMIS data included in the paper's headline figures but not yet in the map layer.
+**Map coverage note:** the map shows schools for all study countries, from national school censuses (EMIS) where available and Overture Maps / OpenStreetMap otherwise. The school layer also includes Pakistan and Uruguay, which were processed but fall outside the paper's 17-country headline figures.
 
 ---
 

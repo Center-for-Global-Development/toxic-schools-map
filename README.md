@@ -25,12 +25,12 @@ Interactive map for the CGD working paper **"Schools in the Shadow of Toxic Site
 The map displays TSIP pollution sites alongside school locations for countries covered by the paper. Click any site to see its name, industry category, country, and nearby schools with distances.
 
 **Layers:**
-- **Polluted sites (TSIP)** — 2,970 sites in paper countries
-- **Schools within 1 km** — ~20,000 schools (clustered); on by default
-- **Schools 1–5 km** — ~152,000 additional schools; loaded on demand (~8 MB)
+- **Polluted sites (TSIP)** — 2,840 sites across the 17 paper countries
+- **Schools within 1 km** — ~19,000 schools (clustered); on by default
+- **Schools 1–5 km** — ~150,000 additional schools; loaded on demand (~8 MB)
 - **5 km buffer circles** — catchment rings around each site with at least one nearby school
 
-**Map coverage note:** the map shows schools for all study countries, from national school censuses (EMIS) where available and Overture Maps / OpenStreetMap otherwise. The school layer also includes Pakistan and Uruguay, which were processed but fall outside the paper's 17-country headline figures.
+**Map coverage note:** the map shows schools for all 17 study countries in the paper, from national school censuses (EMIS) where available and Overture Maps / OpenStreetMap otherwise.
 
 ---
 

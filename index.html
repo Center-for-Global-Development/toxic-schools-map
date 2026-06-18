@@ -357,7 +357,7 @@ function showToast(message, opts) {
   }
 }
 // ── Data (loaded from JSON) ─────────────────────────────────────────────
-// SITES format:   [lat, lon, name, industry, country, site_id, n1km, n5km]
+// SITES format:   [lat, lon, name, industry, country, site_id, n1km, n5km, key_pollutant]
 // SCHOOL1 format: [lat, lon, name, country, dist_km, site_id]
 // SCHOOL5 format: [lat, lon, name, country, dist_km, site_id]
 let SITES = [];
@@ -474,7 +474,7 @@ function renderSites(filterCountry='', filterIndustry='') {
   siteMarkers = [];
   let shown = 0;
   SITES.forEach(s => {
-    const [lat, lon, name, industry, country, sid, n1, n5] = s;
+    const [lat, lon, name, industry, country, sid, n1, n5, pollutant] = s;
     if (filterCountry && country !== filterCountry) return;
     if (filterIndustry && industry !== filterIndustry) return;
     shown++;
@@ -492,6 +492,7 @@ function renderSites(filterCountry='', filterIndustry='') {
     m.bindPopup(`
       <div class="popup-title">${escapeHtml(name)}</div>
       <div class="popup-sub">${escapeHtml(industry)} · ${escapeHtml(country)}</div>
+      <div class="popup-stat">Key pollutant: <strong>${escapeHtml(pollutant || '—')}</strong></div>
       <div class="popup-stat">Schools within <strong>1 km</strong>: <strong>${escapeHtml(n1)}</strong></div>
       <div class="popup-stat">Schools within <strong>5 km</strong>: <strong>${escapeHtml(n5)}</strong></div>
       ${schools1.length ? `<div class="school-list">${schoolList}${moreNote}</div>` : ''}
